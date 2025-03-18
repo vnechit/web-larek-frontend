@@ -76,9 +76,9 @@ interface IUser {
 
 // Заказ
 interface IOrder {
-    items: IProduct[];
+  items: IProduct[];
 	user: IUser;
-    total: number;
+  total: number;
 }
 
 // Корзина
@@ -266,12 +266,6 @@ export class Order extends Form<IOrder> {
   // Метод, отключающий подсвечивание кнопок
   disableButtons(): void;
 }
-
-// Класс, описывающий окошко контакты
-export class Contacts extends Form<IContacts> {
-  constructor(container: HTMLFormElement, events: IEvents);
-}
-/*
 
 ```
 
