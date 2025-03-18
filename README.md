@@ -40,3 +40,87 @@ npm run build
 ```
 yarn build
 ```
+
+## Интерфейсы и типы данных
+
+/* Тип описывающий все возможные категории товара */
+type ProductCategory = 'другое' | 'софт-скил' | 'дополнительное' | 'кнопка' | 'хард-скил';
+    
+/* Интерфейс, описывающий карточку товара */
+interface IProduct {
+  id: string;
+  description: string;
+  image: string;
+  title: string;
+  category: ProductCategory;
+  price: number | null;
+  isSelected: boolean;
+}
+
+/* Доступные спсобы оплаты */
+type PayMethod = 'cash' | 'card';
+
+/* Данные юзера */
+interface IUser {
+    address: string;
+	email: string;
+	phone: string;
+    payment: PayMethod;
+}
+
+/* Заказ */
+interface IOrder {
+    items: IProduct[];
+	user: IUser;
+    total: number;
+}
+
+/* Корзина */
+interface IBasket {
+    list: IProduct[];
+    price: number;
+}
+
+/*
+    Интерфейс, описывающий внутренне состояние приложения
+    Используется для хранения карточек, корзины, заказа пользователя, ошибок
+    в формах
+    Так же имеет методы для работы с карточками и корзиной
+*/
+interface IAppState {
+  basket: IBasket;
+  store: IProduct[];
+  order: IOrder;
+  addToBasket(value: IProduct): void;
+  deleteFromBasket(id: string): void;
+  clearBasket(): void;
+  getBasketAmount(): number;
+  getTotalBasketPrice(): number;
+  refreshOrder(): boolean;
+  setStore(items: IProduct[]): void;
+  resetSelected(): void;
+}
+
+## Классы
+
+/* Базовая модель, чтобы можно было отличить ее от простых объектов с данными */
+abstract class Model<T> {
+  constructor(data: Partial<T>, protected events: IEvents) {}
+  emitChanges(event: string, payload?: object) {}
+}
+
+/* Класс, описывающий состояние приложения */
+export class AppState extends Model<IAppState> {
+  basket: IProduct[] = [];
+  store: IProduct[];
+  order: IOrder = {};
+  addToBasket(value: IProduct): void;
+  deleteFromBasket(id: string): void;
+  clearBasket(): void;
+  getBasketAmount(): number;
+  getTotalBasketPrice(): number;
+  setItems(): void;
+  refreshOrder(): boolean;
+  setStore(items: IProduct[]): void;
+  resetSelected(): void;
+}
