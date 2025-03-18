@@ -118,9 +118,9 @@ interface IPage {
 
 ```
 
-```TypeScript
-
 ## Классы
+
+```TypeScript
 
 // Базовая модель, чтобы можно было отличить ее от простых объектов с данными 
 abstract class Model<T> {
