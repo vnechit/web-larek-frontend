@@ -124,23 +124,37 @@ interface IPage {
 
 // Базовая модель, чтобы можно было отличить ее от простых объектов с данными 
 abstract class Model<T> {
+  // Принимает данные для хранения, эвент эмиттер
   constructor(data: Partial<T>, protected events: IEvents) {}
+  // Вызывает эвент
   emitChanges(event: string, payload?: object) {}
 }
 
 // Класс, описывающий состояние приложения
-export class AppState extends Model<IAppState> {
+class AppState extends Model<IAppState> {
+  // Корзина с товарами
   basket: IProduct[] = [];
+  // Массив со всеми товарами
   store: IProduct[];
+  // Объект заказа клиента
   order: IOrder = {};
+  // Метод для добавления товара в корзину
   addToBasket(value: IProduct): void;
+  // Метод для удаления товара из корзины
   deleteFromBasket(id: string): void;
+  // Метод для полной очистки корзины
   clearBasket(): void;
+  // Метод для получения количества товаров в корзине
   getBasketAmount(): number;
+  // Метод для получения суммы цены всех товаров в корзине
   getTotalBasketPrice(): number;
+  // Метод для добавления ID товаров в корзине в поле items для order
   setItems(): void;
+  // Очистить order после покупки товаров
   refreshOrder(): boolean;
+  // Метод для превращения данных, полученых с сервера в тип данных приложения
   setStore(items: IProduct[]): void;
+  // Метод для обновления поля selected во всех товарах после совершения покупки
   resetSelected(): void;
 }
 
@@ -180,6 +194,7 @@ abstract class Component<T> {
 
 // Класс, описывающий главную страницу
 class Page extends Component<IPage> {
+  // Ссылки на внутренние элементы
   protected _counter: HTMLElement;
   protected _store: HTMLElement;
   protected _wrapper: HTMLElement;
@@ -261,6 +276,7 @@ export class Order extends Form<IOrder> {
   protected _card: HTMLButtonElement;
   protected _cash: HTMLButtonElement;
 
+  // Конструктор принимает имя блока, родительский элемент и обработчик событий
   constructor(protected blockName: string, container: HTMLFormElement, protected events: IEvents);
 
   // Метод, отключающий подсвечивание кнопок
