@@ -1,6 +1,5 @@
 export const API_URL = `${process.env.API_ORIGIN}/api/weblarek`;
 export const CDN_URL = `${process.env.API_ORIGIN}/content/weblarek`;
-import { CategoryMapping } from '../types';
 
 
 export const settings = {
@@ -11,10 +10,10 @@ export const settings = {
         basket: '.header__basket',
         lockScroll: 'page__wrapper_locked',
         activeButton: 'button_alt-active',
-        basketItemIndex: '.basket__item-index',
         form: {
             error: '.form__errors'
-        }
+        },
+        modal: '#modal-container',
     },
     templates: {
         card: '#card-catalog',
@@ -26,15 +25,31 @@ export const settings = {
         success: '#success'
     },
     modals: {
-        container: '#modal-container',
+        container: '.modal-container',
         close: '.modal__close',
         content: '.modal__content',
         active: 'modal_active'
     },
+    card: {
+        title: '.card__title',
+        image: '.card__image',
+        description: '.card__text',
+        price: '.card__price',
+        button: '.card__button',
+        category: '.card__category',
+        buttonBasket: '.basket__item-delete'
+    },
+    basket: {
+        price: '.basket__price',
+        button: '.basket__button',
+        basketItemIndex: '.basket__item-index',
+        list: '.basket__list'
+    },
     events: {
         modal: {
             close: 'modal:close',
-            open: 'modal:open'
+            open: 'modal:open',
+            toggle: 'modal:toggle'
         },
         items: {
             changed: 'items:changed'
@@ -66,11 +81,3 @@ export const settings = {
         }
     }
 };
-
-export const categoryMapping: CategoryMapping = {
-    'другое': 'card__category_other',
-    'софт-скил': 'card__category_soft',
-    'дополнительное': 'card__category_additional',
-    'кнопка': 'card__category_button',
-    'хард-скил': 'card__category_hard',
-  };

@@ -1,19 +1,34 @@
-export type CategoryType = 'другое' | 'софт-скил' | 'дополнительное' | 'кнопка' | 'хард-скил';
+// Types
+export type TCategory = 'другое' | 'софт-скил' | 'дополнительное' | 'кнопка' | 'хард-скил';
+export type TPayMethod = 'cash' | 'card';
 
-export type CategoryMapping = {
-  [Key in CategoryType]: string;
-};
-
-export interface ApiResponse {
-  items: IProduct[];
-}
-
+// Interfaces
 export interface IProduct {
   id: string;
-  description: string;
-  image: string;
   title: string;
-  category: CategoryType;
   price: number | null;
-  selected: boolean;
+  img: string;
+  category: string;
+  description: string;
+  isSelected: boolean;
+}
+
+export interface IUser {
+  address: string | null;
+	email: string | null;
+	phone: string | null;
+  payment: TPayMethod | null;
+}
+
+export interface IProductsData {
+  list: IProduct[];
+  addProduct (product: IProduct): void;
+  deleteProduct (productId: string) : void;
+  getProduct (productId: string) : IProduct;
+}
+
+export interface IBasket {
+  list: IProduct[];
+  total: number;
+  count: number;
 }

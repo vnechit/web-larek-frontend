@@ -17,6 +17,9 @@ const stylesHandler = MiniCssExtractPlugin.loader;
 const config = {
   entry: "./src/index.ts",
   devtool: "source-map",
+  experiments: {
+    topLevelAwait: true
+  },
   output: {
     path: path.resolve(__dirname, "dist"),
   },
@@ -30,6 +33,7 @@ const config = {
     new HtmlWebpackPlugin({
       template: "src/pages/index.html"
     }),
+    
 
     new MiniCssExtractPlugin(),
 
