@@ -11,7 +11,7 @@ import { ProductsData } from './components/models/product';
 import { BasketData } from './components/models/basket';
 import { User } from './components/models/user';
 // Import Views
-import { Card } from './components/views/card';
+import { CardStore, CardPreview, CardBasket } from './components/views/card';
 import { CardsContainer } from './components/views/cardsContainer';
 import { Modal } from './components/views/modal';
 import { Basket } from './components/views/basket';
@@ -51,7 +51,7 @@ const basket = new Basket(cloneTemplate(basketTemplate), events);
 
 await api.get('/product').then((res: ApiListResponse<IProduct>) => {
   productsData.list = res.items;   
-  const productCards: HTMLElement[] = productsData.list.map((element: IProduct) => new Card(cloneTemplate(cardTemplate), events).render(element));
+  const productCards: HTMLElement[] = productsData.list.map((element: IProduct) => new CardStore(cloneTemplate(cardTemplate), events).render(element));
   cardsContainer.render({catalog: productCards}); 
   basketData.list = [];    
 }).catch((err) => {
@@ -74,7 +74,7 @@ function handleAddToBasket (product: Partial<IProduct>) {
 
 function handleOpenCardPreview (card: Partial<IProduct>) {
   const productToShow: IProduct = productsData.getProduct(card.id);  
-  const productToShowElement: HTMLElement = new Card(cloneTemplate(cardPreviewTemplate), events).render(productToShow);    
+  const productToShowElement: HTMLElement = new CardPreview(cloneTemplate(cardPreviewTemplate), events).render(productToShow);    
   modal.render({content: productToShowElement});
   modal.open();
 }
@@ -88,7 +88,7 @@ function handleModalClose () {
 }
 
 function handleOpenBasket () { 
-  const productsInBasket: HTMLElement[] = basketData.list.map((element) => new Card(cloneTemplate(basketCardTemplate), events).render(element));
+  const productsInBasket: HTMLElement[] = basketData.list.map((element, ind) => new CardBasket(cloneTemplate(basketCardTemplate), events).render(element, ind+1));
   const basketToShow = basket.render({list: productsInBasket}, basketData.total);  
   modal.render({content: basketToShow});
   modal.open();
