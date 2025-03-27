@@ -49,7 +49,8 @@ const cardsContainer = new CardsContainer(ensureElement<HTMLElement>(settings.pa
 const modal = new Modal(modalElement, events);
 const basket = new Basket(cloneTemplate(basketTemplate), events);
 
-await api.get('/product').then((res: ApiListResponse<IProduct>) => {
+await api.get('/product')
+.then((res: ApiListResponse<IProduct>) => {
   productsData.list = res.items;   
   const productCards: HTMLElement[] = productsData.list.map((element: IProduct) => new CardStore(cloneTemplate(cardTemplate), events).render(element));
   cardsContainer.render({catalog: productCards}); 
@@ -69,7 +70,6 @@ function handleAddToBasket (product: Partial<IProduct>) {
   basketData.addProduct(productsData.getProduct(product.id));
   productsData.markProduct(product.id, true);  
   updateBasketCounter(basketData.count);
-  modal.close();
 }
 
 function handleOpenCardPreview (card: Partial<IProduct>) {
@@ -83,7 +83,7 @@ function handleModalOpenned () {
   page.classList.add(settings.page.lockScroll);
 }
 
-function handleModalClose () {
+function handleModalClose () {  
   page.classList.remove(settings.page.lockScroll);
 }
 

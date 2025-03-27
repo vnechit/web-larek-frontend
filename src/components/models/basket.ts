@@ -52,7 +52,6 @@ export class BasketData implements IBasket{
     }
 
     clearBasket () {
-        
         this._list = [];
         this._count = 0;
         this._total = 0;

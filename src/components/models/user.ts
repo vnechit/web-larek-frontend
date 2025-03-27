@@ -29,7 +29,7 @@ export class User implements IUser{
         this._payment = value;
     }
 
-    setOrderDetails (payment: TPayMethod, address: string) {                        
+    setOrderDetails (payment: TPayMethod, address: string) {             
         this.payment = payment;
         this.address = address;
     }
