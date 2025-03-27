@@ -1,6 +1,8 @@
 // Types
 export type TCategory = 'другое' | 'софт-скил' | 'дополнительное' | 'кнопка' | 'хард-скил';
 export type TPayMethod = 'cash' | 'card';
+export type TUserOrder = Pick<IUser, 'address' | 'payment'>;
+export type TUserContacts = Pick<IUser, 'email' | 'phone'>;
 
 // Interfaces
 export interface IProduct {

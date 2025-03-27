@@ -50,4 +50,15 @@ export class BasketData implements IBasket{
         this._list = this._list.filter((element) => element.id !== value.id);
         this.count--;
     }
+
+    clearBasket () {
+        
+        this._list = [];
+        this._count = 0;
+        this._total = 0;
+    }
+
+    getIds () {
+        return this.list.map((element) => element.id);
+    }
 }

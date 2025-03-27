@@ -5,16 +5,19 @@ import { ensureElement, cloneTemplate } from './utils/utils';
 import { API_URL } from './utils/constants';
 import { settings } from './utils/constants';
 // Import types
-import { IProduct } from './types/index';
+import { IProduct, TUserContacts, TUserOrder } from './types/index';
 // Import models
 import { ProductsData } from './components/models/product';
 import { BasketData } from './components/models/basket';
+import { User } from './components/models/user';
 // Import Views
 import { Card } from './components/views/card';
 import { CardsContainer } from './components/views/cardsContainer';
 import { Modal } from './components/views/modal';
 import { Basket } from './components/views/basket';
 import { Order } from './components/views/order';
+import { Contacts } from './components/views/contacts';
+import { Success } from './components/views/success';
 // Import styles
 import './scss/styles.scss';
 
@@ -24,8 +27,8 @@ const cardPreviewTemplate = ensureElement<HTMLTemplateElement>(settings.template
 const basketTemplate = ensureElement<HTMLTemplateElement>(settings.templates.basket);
 const basketCardTemplate = ensureElement<HTMLTemplateElement>(settings.templates.cardBasket);
 const orderTemplate = ensureElement<HTMLTemplateElement>(settings.templates.order);
-// const contactsTemplate = ensureElement<HTMLTemplateElement>(settings.templates.contacts);
-// const successTemplate = ensureElement<HTMLTemplateElement>(settings.templates.success);
+const contactsTemplate = ensureElement<HTMLTemplateElement>(settings.templates.contacts);
+const successTemplate = ensureElement<HTMLTemplateElement>(settings.templates.success);
 
 // Other consts elements
 const modalElement = ensureElement<HTMLElement>(settings.page.modal);
@@ -40,6 +43,7 @@ const events = new EventEmitter();
 // Data classes
 const productsData = new ProductsData(events);
 const basketData = new BasketData(events);
+const userData = new User(events);
 // Views classes
 const cardsContainer = new CardsContainer(ensureElement<HTMLElement>(settings.page.gallery));
 const modal = new Modal(modalElement, events);
@@ -91,8 +95,8 @@ function handleOpenBasket () {
 }
 
 function handleBasketOrder () {
-  console.log('button in basket pressed');
-  const order = new Order(cloneTemplate(orderTemplate), events);
+  const order = new Order(cloneTemplate(orderTemplate), events).render({isValid: false});
+  modal.render({content: order});
 }
 
 function hadleDeleteFromBasket (product: Partial<IProduct>) {
@@ -100,6 +104,34 @@ function hadleDeleteFromBasket (product: Partial<IProduct>) {
   productsData.markProduct(product.id, false);  
   updateBasketCounter(basketData.count);
   handleOpenBasket();
+}
+
+function handleOrderFormSubmit (data: Partial<TUserOrder>) {          
+  userData.setOrderDetails(data.payment, data.address);  
+  const contacts = new Contacts(cloneTemplate(contactsTemplate), events).render({isValid: false});
+  modal.render({content: contacts});
+}
+
+async function handleContactsFormSubmit (data: Partial<TUserContacts>) {
+  userData.setContactDetails(data.email, data.phone);  
+  const toSend = {...userData.getUserInfo(), ...{items: basketData.getIds(), total: basketData.total}};  
+  await api.post('/order', toSend)
+    .then((res) => {
+      const success = new Success(cloneTemplate(successTemplate), events).render({}, 19000);
+      modal.render({content: success});
+  })
+  .catch((err) => {
+    console.log(err)
+  })
+}
+
+function handleSuccessOrder () {
+  modal.close();
+  basketData.getIds().forEach((element) => {
+    productsData.markProduct(element, false); 
+  });
+  basketData.clearBasket();
+  updateBasketCounter(0);
 }
 
 // Events listeners
@@ -112,3 +144,6 @@ events.on(settings.events.modal.open, handleModalOpenned);
 events.on(settings.events.modal.close, handleModalClose);
 events.on(settings.events.basket.order, handleBasketOrder);
 events.on(settings.events.basket.delete, hadleDeleteFromBasket);
+events.on(settings.events.order.submit, handleOrderFormSubmit);
+events.on(settings.events.contacts.submit, handleContactsFormSubmit);
+events.on(settings.events.order.success, handleSuccessOrder);

@@ -43,13 +43,15 @@ export const settings = {
         price: '.basket__price',
         button: '.basket__button',
         basketItemIndex: '.basket__item-index',
-        list: '.basket__list'
+        list: '.basket__list', 
+        order: '.order__button',
+        success: '.order-success__close',
+        description: '.order-success__description'
     },
     events: {
         modal: {
             close: 'modal:close',
             open: 'modal:open',
-            toggle: 'modal:toggle'
         },
         items: {
             changed: 'items:changed'
@@ -59,7 +61,6 @@ export const settings = {
             toBasket: 'card:toBasket'
         },
         basket: {
-            open: 'basket:open',
             delete: 'basket:delete',
             order: 'basket:order'
         },

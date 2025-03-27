@@ -42,6 +42,6 @@ export class Basket extends Component<IBasketList> {
 
     render (data?: Partial<IBasketList>, total?: number): HTMLElement {
         this.total = total;
-        return super.render(data)
+        return super.render(data);
     }
 }
