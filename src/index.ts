@@ -5,7 +5,7 @@ import { ensureElement, cloneTemplate } from './utils/utils';
 import { API_URL } from './utils/constants';
 import { settings } from './utils/constants';
 // Import types
-import { IProduct, TUserContacts, TUserOrder } from './types/index';
+import { IOrderAnswer, IProduct, TUserContacts, TUserOrder } from './types/index';
 // Import models
 import { ProductsData } from './components/models/product';
 import { BasketData } from './components/models/basket';
@@ -116,8 +116,8 @@ async function handleContactsFormSubmit (data: Partial<TUserContacts>) {
   userData.setContactDetails(data.email, data.phone);  
   const toSend = {...userData.getUserInfo(), ...{items: basketData.getIds(), total: basketData.total}};  
   await api.post('/order', toSend)
-    .then((res) => {
-      const success = new Success(cloneTemplate(successTemplate), events).render({}, 19000);
+    .then((res: IOrderAnswer) => {
+      const success = new Success(cloneTemplate(successTemplate), events).render({}, res.total);
       modal.render({content: success});
   })
   .catch((err) => {

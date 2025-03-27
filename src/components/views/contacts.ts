@@ -1,34 +1,26 @@
 import { settings } from "../../utils/constants";
 import { ensureElement } from "../../utils/utils";
 import { IEvents } from "../base/events";
-import { Component } from "./component";
 import { TUserContacts } from "../../types";
+import { Form } from "./formComponent";
 
 interface IContacts {
     isValid: boolean;
 }
 
-export class Contacts extends Component<IContacts>{
-    protected events: IEvents;
-    protected _isValid: boolean;
-    protected button: HTMLButtonElement;
+export class Contacts extends Form<IContacts>{
     protected inputEmail: HTMLInputElement;
     protected inputPhone: HTMLInputElement;
-    protected error: HTMLElement;
     private data: TUserContacts = {
         email: '',
         phone: ''
     };
 
     constructor (protected container: HTMLElement, events: IEvents) {
-        super(container);
-
-        this.events = events;
+        super(container, events, '.button');
                 
-        this.button = ensureElement<HTMLButtonElement>('.button', this.container);        
-        this.inputEmail = this.container.querySelector("[name=email]");
-        this.inputPhone = this.container.querySelector("[name=phone]");
-        this.error = ensureElement<HTMLElement>(settings.page.form.error, this.container);
+        this.inputEmail = ensureElement<HTMLInputElement>("[name=email]", this.container);
+        this.inputPhone = ensureElement<HTMLInputElement>("[name=phone]", this.container);
 
         this.container.addEventListener('submit', (event) => {
             event.preventDefault();            
@@ -47,11 +39,6 @@ export class Contacts extends Component<IContacts>{
             this.data.phone = value; 
             this.validateForm();
         });
-    }
-
-    set isValid (value: boolean) {
-        this._isValid = value;
-        this.button.disabled = !value;
     }
 
     validateForm () {

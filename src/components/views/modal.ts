@@ -42,7 +42,7 @@ export class Modal extends Component<IModel> {
     }
 
     close () {
-        this.container.classList.remove("modal_active");
+        this.container.classList.remove(settings.modals.active);
         this._content.innerHTML = '';
         this.events.emit(settings.events.modal.close);
     }
