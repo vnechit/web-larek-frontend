@@ -13,6 +13,7 @@ export class BasketData implements IBasket{
         this.events = events;
         this.total = 0;
         this.count = 0;
+        this._list = [];
     }
 
     set list (values: IProduct[]) {

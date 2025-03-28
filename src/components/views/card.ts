@@ -101,7 +101,8 @@ export class CardPreview extends CardStore {
     this._description = ensureElement<HTMLElement>(settings.card.description, this.container);
     this.button = ensureElement<HTMLButtonElement>(settings.card.button, this.container);
     
-    this.button.addEventListener('click', ()=>{
+    this.button.addEventListener('click', (event)=>{
+      event.stopPropagation();
       this.isSelected = true;
       this.events.emit(settings.events.card.toBasket, {id: this._id});
     });

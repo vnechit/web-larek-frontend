@@ -53,18 +53,9 @@ const contacts = new Contacts(cloneTemplate(contactsTemplate), events);
 const success = new Success(cloneTemplate(successTemplate), events);
 const page = new Page(pageElement, events);
 
-await api.get('/product')
-.then((res: ApiListResponse<IProduct>) => {
-  productsData.list = res.items;      
-}).catch((err) => {
-  console.error(err);
-});
-
 // Events handlers
 
-function handleNewProducts () {
-  console.log('in handle');
-  
+function handleNewProducts () {    
   const productCards: HTMLElement[] = productsData.list.map((element: IProduct) => new CardStore(cloneTemplate(cardTemplate), events).render(element));
   cardsContainer.render({catalog: productCards}); 
 }
@@ -73,9 +64,10 @@ function handleAddToBasket (product: Partial<IProduct>) {
   basketData.addProduct(productsData.getProduct(product.id));
   productsData.markProduct(product.id, true);  
   page.basketCounter = basketData.count;
+  modal.close();
 }
 
-function handleOpenCardPreview (card: Partial<IProduct>) {
+function handleOpenCardPreview (card: Partial<IProduct>) {  
   const productToShow: IProduct = productsData.getProduct(card.id);  
   const productToShowElement: HTMLElement = new CardPreview(cloneTemplate(cardPreviewTemplate), events).render(productToShow);    
   modal.render({content: productToShowElement});
@@ -86,7 +78,7 @@ function handleModalOpenned () {
   page.toggleLockScroll();
 }
 
-function handleModalClose () {  
+function handleModalClose () {   
   page.toggleLockScroll();
 }
 
@@ -97,7 +89,7 @@ function handleOpenBasket () {
   modal.open();
 }
 
-function handleBasketOrder () {
+function handleBasketButtonPressed () {
   modal.render({content: order.render({isValid: false})});
 }
 
@@ -137,13 +129,21 @@ function handleSuccessOrder () {
 // Events listeners
 
 events.on(settings.events.items.changed, handleNewProducts);
-events.on(settings.events.card.toBasket, handleAddToBasket);
-events.on(settings.events.card.select, handleOpenCardPreview);
 events.on(settings.events.modal.open, handleModalOpenned);
 events.on(settings.events.modal.close, handleModalClose);
+events.on(settings.events.card.toBasket, handleAddToBasket);
+events.on(settings.events.card.select, handleOpenCardPreview);
 events.on(settings.events.basket.open, handleOpenBasket);
-events.on(settings.events.basket.order, handleBasketOrder);
+events.on(settings.events.basket.order, handleBasketButtonPressed);
 events.on(settings.events.basket.delete, hadleDeleteFromBasket);
 events.on(settings.events.order.submit, handleOrderFormSubmit);
 events.on(settings.events.contacts.submit, handleContactsFormSubmit);
 events.on(settings.events.order.success, handleSuccessOrder);
+
+
+await api.get('/product')
+.then((res: ApiListResponse<IProduct>) => {
+  productsData.list = res.items; 
+}).catch((err) => {
+  console.error(err);
+});
