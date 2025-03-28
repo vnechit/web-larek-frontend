@@ -11,7 +11,7 @@ export class ProductsData implements IProductsData {
     }
 
     set list (list: IProduct[]) {
-        this._list = list;        
+        this._list = list;     
         this.events.emit(settings.events.items.changed);
     }
 

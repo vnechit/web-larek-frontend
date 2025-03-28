@@ -18,6 +18,7 @@ import { Basket } from './components/views/basket';
 import { Order } from './components/views/order';
 import { Contacts } from './components/views/contacts';
 import { Success } from './components/views/success';
+import { Page } from './components/views/page';
 // Import styles
 import './scss/styles.scss';
 
@@ -32,9 +33,8 @@ const successTemplate = ensureElement<HTMLTemplateElement>(settings.templates.su
 
 // Other consts elements
 const modalElement = ensureElement<HTMLElement>(settings.page.modal);
-const page = ensureElement<HTMLElement>(settings.page.wrapper);
-const basketCounter = ensureElement<HTMLElement>(settings.page.basketCounter);
-const basketButton = ensureElement<HTMLElement>(settings.page.basket);
+const cardsContainerElement = ensureElement<HTMLElement>(settings.page.gallery);
+const pageElement = ensureElement<HTMLElement>(settings.page.wrapper);
 
 // Base Api and Events
 const api = new Api(API_URL);
@@ -45,31 +45,34 @@ const productsData = new ProductsData(events);
 const basketData = new BasketData(events);
 const userData = new User(events);
 // Views classes
-const cardsContainer = new CardsContainer(ensureElement<HTMLElement>(settings.page.gallery));
+const cardsContainer = new CardsContainer(cardsContainerElement);
 const modal = new Modal(modalElement, events);
 const basket = new Basket(cloneTemplate(basketTemplate), events);
+const order = new Order(cloneTemplate(orderTemplate), events);
+const contacts = new Contacts(cloneTemplate(contactsTemplate), events);
+const success = new Success(cloneTemplate(successTemplate), events);
+const page = new Page(pageElement, events);
 
 await api.get('/product')
 .then((res: ApiListResponse<IProduct>) => {
-  productsData.list = res.items;   
-  const productCards: HTMLElement[] = productsData.list.map((element: IProduct) => new CardStore(cloneTemplate(cardTemplate), events).render(element));
-  cardsContainer.render({catalog: productCards}); 
-  basketData.list = [];    
+  productsData.list = res.items;      
 }).catch((err) => {
   console.error(err);
 });
 
-// Additional functions
-function updateBasketCounter (value: number) {
-  basketCounter.textContent = String(value);
-}
-
 // Events handlers
+
+function handleNewProducts () {
+  console.log('in handle');
+  
+  const productCards: HTMLElement[] = productsData.list.map((element: IProduct) => new CardStore(cloneTemplate(cardTemplate), events).render(element));
+  cardsContainer.render({catalog: productCards}); 
+}
 
 function handleAddToBasket (product: Partial<IProduct>) {
   basketData.addProduct(productsData.getProduct(product.id));
   productsData.markProduct(product.id, true);  
-  updateBasketCounter(basketData.count);
+  page.basketCounter = basketData.count;
 }
 
 function handleOpenCardPreview (card: Partial<IProduct>) {
@@ -80,11 +83,11 @@ function handleOpenCardPreview (card: Partial<IProduct>) {
 }
 
 function handleModalOpenned () {
-  page.classList.add(settings.page.lockScroll);
+  page.toggleLockScroll();
 }
 
 function handleModalClose () {  
-  page.classList.remove(settings.page.lockScroll);
+  page.toggleLockScroll();
 }
 
 function handleOpenBasket () { 
@@ -95,30 +98,32 @@ function handleOpenBasket () {
 }
 
 function handleBasketOrder () {
-  const order = new Order(cloneTemplate(orderTemplate), events).render({isValid: false});
-  modal.render({content: order});
+  modal.render({content: order.render({isValid: false})});
 }
 
 function hadleDeleteFromBasket (product: Partial<IProduct>) {
   basketData.removeProduct(productsData.getProduct(product.id));
   productsData.markProduct(product.id, false);  
-  updateBasketCounter(basketData.count);
+  page.basketCounter = basketData.count;
   handleOpenBasket();
 }
 
 function handleOrderFormSubmit (data: Partial<TUserOrder>) {          
   userData.setOrderDetails(data.payment, data.address);  
-  const contacts = new Contacts(cloneTemplate(contactsTemplate), events).render({isValid: false});
-  modal.render({content: contacts});
+  modal.render({content: contacts.render({isValid: false})});
 }
 
 async function handleContactsFormSubmit (data: Partial<TUserContacts>) {
   userData.setContactDetails(data.email, data.phone);  
   const toSend = {...userData.getUserInfo(), ...{items: basketData.getIds(), total: basketData.total}};  
   await api.post('/order', toSend)
-    .then((res: IOrderAnswer) => {
-      const success = new Success(cloneTemplate(successTemplate), events).render({}, res.total);
-      modal.render({content: success});
+    .then((res: IOrderAnswer) => {;
+      modal.render({content: success.render({}, res.total)});
+      basketData.getIds().forEach((element) => {
+        productsData.markProduct(element, false); 
+      });
+      basketData.clearBasket();
+      page.basketCounter = 0;
   })
   .catch((err) => {
     console.log(err)
@@ -127,21 +132,16 @@ async function handleContactsFormSubmit (data: Partial<TUserContacts>) {
 
 function handleSuccessOrder () {
   modal.close();
-  basketData.getIds().forEach((element) => {
-    productsData.markProduct(element, false); 
-  });
-  basketData.clearBasket();
-  updateBasketCounter(0);
 }
 
 // Events listeners
 
-basketButton.addEventListener('click', handleOpenBasket);
-
+events.on(settings.events.items.changed, handleNewProducts);
 events.on(settings.events.card.toBasket, handleAddToBasket);
 events.on(settings.events.card.select, handleOpenCardPreview);
 events.on(settings.events.modal.open, handleModalOpenned);
 events.on(settings.events.modal.close, handleModalClose);
+events.on(settings.events.basket.open, handleOpenBasket);
 events.on(settings.events.basket.order, handleBasketOrder);
 events.on(settings.events.basket.delete, hadleDeleteFromBasket);
 events.on(settings.events.order.submit, handleOrderFormSubmit);

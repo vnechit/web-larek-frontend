@@ -62,7 +62,8 @@ export const settings = {
         },
         basket: {
             delete: 'basket:delete',
-            order: 'basket:order'
+            order: 'basket:order',
+            open: 'basket:open'
         },
         order: {
             success: 'order:success',

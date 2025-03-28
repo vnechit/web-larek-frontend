@@ -10,6 +10,7 @@ class Card extends Component<IProduct> {
   protected events: IEvents;
   protected _title: HTMLElement;
   protected _price: HTMLElement;
+  protected button?: HTMLButtonElement;
   protected _id: string;
 
   constructor (protected container: HTMLElement, events: IEvents) {
@@ -29,8 +30,9 @@ class Card extends Component<IProduct> {
     this._id = value;
   }
 
-  set price (value: number) {
-    this._price.textContent = String(value) + ' синапсов';
+  set price (value: number) {    
+    this._price.textContent = `${value ? value : 0} синапсов`;
+    if (this.button && !value) this.button.disabled = true;
   }
 
   set title (value: string) {
@@ -91,7 +93,6 @@ export class CardStore extends Card {
 
 export class CardPreview extends CardStore {
   protected _description: HTMLElement;
-  protected button: HTMLButtonElement;
   protected _isSelected: boolean;
 
   constructor (protected container: HTMLElement, events: IEvents) {
@@ -99,7 +100,7 @@ export class CardPreview extends CardStore {
 
     this._description = ensureElement<HTMLElement>(settings.card.description, this.container);
     this.button = ensureElement<HTMLButtonElement>(settings.card.button, this.container);
-      
+    
     this.button.addEventListener('click', ()=>{
       this.isSelected = true;
       this.events.emit(settings.events.card.toBasket, {id: this._id});
@@ -118,7 +119,6 @@ export class CardPreview extends CardStore {
 
 export class CardBasket extends Card {
   protected _basketIndex: HTMLElement;
-  protected button: HTMLButtonElement;
 
   constructor (protected container: HTMLElement, events: IEvents) {
     super(container, events);
