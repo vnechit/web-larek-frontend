@@ -8,14 +8,14 @@ export abstract class Form<T> extends Component<T> {
     protected events: IEvents;
     protected _isValid: boolean;
     protected button: HTMLButtonElement;
-    protected error: HTMLElement;
+    protected _error: HTMLElement;
 
     constructor(protected container: HTMLElement, events: IEvents, button: string) {
         super(container);
 
         this.events = events;
 
-        this.error = ensureElement<HTMLElement>(settings.page.form.error, this.container);
+        this._error = ensureElement<HTMLElement>(settings.page.form.error, this.container);
         this.button = ensureElement<HTMLButtonElement>(button, this.container);       
     }
 
@@ -24,5 +24,7 @@ export abstract class Form<T> extends Component<T> {
         this.button.disabled = !value;
     }
 
-    abstract validateForm (): void;
+    set error (error: string) {
+        this._error.textContent = error;
+    }
 }

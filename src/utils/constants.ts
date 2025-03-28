@@ -70,7 +70,7 @@ export const settings = {
             submit: 'order:submit',
             ready: 'order:ready',
             form: {
-                error: 'orderFormErrors:change',
+                error: 'orderError:change',
                 input: 'orderInput:change'
             }
         },
@@ -78,7 +78,8 @@ export const settings = {
             submit: 'contacts:submit',
             ready: 'contacts:ready',
             form: {
-                error: 'contactsFormErrors:change'
+                error: 'contactsError:change',
+                input: 'contactsInput: change'
             }
         }
     }

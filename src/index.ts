@@ -100,13 +100,11 @@ function hadleDeleteFromBasket (product: Partial<IProduct>) {
   handleOpenBasket();
 }
 
-function handleOrderFormSubmit (data: Partial<TUserOrder>) {          
-  userData.setOrderDetails(data.payment, data.address);  
+function handleOrderFormSubmit () {          
   modal.render({content: contacts.render({isValid: false})});
 }
 
-async function handleContactsFormSubmit (data: Partial<TUserContacts>) {
-  userData.setContactDetails(data.email, data.phone);  
+async function handleContactsFormSubmit () {
   const toSend = {...userData.getUserInfo(), ...{items: basketData.getIds(), total: basketData.total}};  
   await api.post('/order', toSend)
     .then((res: IOrderAnswer) => {;
@@ -126,6 +124,34 @@ function handleSuccessOrder () {
   modal.close();
 }
 
+function handleOrderFormInput (data: Partial<TUserOrder>) {
+  userData.setOrderDetails(data);
+}
+
+function handleOrderFormError (data: {error: string}) {  
+  order.isValid = false;
+  order.error = data.error;
+}
+
+function handleContactsFormInput (data: Partial<TUserContacts>) {
+  userData.setContactDetails(data);
+}
+
+function handleContactsFormError (data: {error: string}) {
+  contacts.error = data.error;
+  contacts.isValid = false;
+}
+
+function handleOrderFormReady () {
+  order.isValid = true;
+  order.error = '';
+}
+
+function handleContactsFormReady () {
+  contacts.isValid = true;
+  contacts.error = '';
+}
+
 // Events listeners
 
 events.on(settings.events.items.changed, handleNewProducts);
@@ -139,7 +165,12 @@ events.on(settings.events.basket.delete, hadleDeleteFromBasket);
 events.on(settings.events.order.submit, handleOrderFormSubmit);
 events.on(settings.events.contacts.submit, handleContactsFormSubmit);
 events.on(settings.events.order.success, handleSuccessOrder);
-
+events.on(settings.events.order.form.input, handleOrderFormInput);
+events.on(settings.events.order.form.error, handleOrderFormError);
+events.on(settings.events.contacts.form.input, handleContactsFormInput);
+events.on(settings.events.contacts.form.error, handleContactsFormError);
+events.on(settings.events.order.ready, handleOrderFormReady);
+events.on(settings.events.contacts.ready, handleContactsFormReady);
 
 await api.get('/product')
 .then((res: ApiListResponse<IProduct>) => {
