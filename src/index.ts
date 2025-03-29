@@ -104,9 +104,9 @@ function handleOrderFormSubmit () {
   modal.render({content: contacts.render({isValid: false})});
 }
 
-async function handleContactsFormSubmit () {
+function handleContactsFormSubmit () {
   const toSend = {...userData.getUserInfo(), ...{items: basketData.getIds(), total: basketData.total}};  
-  await api.post('/order', toSend)
+  api.post('/order', toSend)
     .then((res: IOrderAnswer) => {;
       modal.render({content: success.render({}, res.total)});
       basketData.getIds().forEach((element) => {
